@@ -28,7 +28,7 @@ class Dashboard extends Component{
 
     renderSearchBar = () => (
         <form onSubmit={this.searchByFilters} className='input-container'>
-            <input placeholder='Search by name, role or email and press ENTER' id='searchInput' type="search" />
+            <input onChange={this.searchByFilters} placeholder='Search by name, role or email' id='searchInput' type="search" />
             <BsSearch className='search-icon' />
         </form>
     )

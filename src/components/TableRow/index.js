@@ -6,14 +6,9 @@ import '../Dashboard/index.css'
 import './index.css'
 
 class TableRow extends Component{
-    state = {isEditable:false, nameInput:this.props.name, emailInput:this.props.email, roleInput:this.props.role, isChecked:false}
+    state = {isEditable:false, nameInput:this.props.userDetails.name, emailInput:this.props.userDetails.email, roleInput:this.props.userDetails.role, isChecked:false}
 
-    componentDidMount(){
-        const {userDetails} = this.props
-        const {name, email, role} = userDetails
-
-        this.setState({nameInput:name, emailInput:email, roleInput:role})
-    }
+    
 
     changeEditState = () => {
         this.setState(prevState => ({isEditable:!prevState.isEditable}))
@@ -75,9 +70,9 @@ class TableRow extends Component{
                     {isEditable&&<input onChange={this.onChangeRole} type="text" value={roleInput} />}
                 </div>
                 <div className='actions-icons'>
-                    {isEditable&&<button className="save-button"><RiSave3Line onClick={this.saveChanges} className="save-icon" /></button>}
-                    {!isEditable&&<button className="edit-button"><RiEditBoxLine onClick={this.changeEditState} className="edit-icon" /></button>}
-                    <button className="delete-user-button"><AiOutlineDelete onClick={this.deleteUser} className="delete-icon" /></button>
+                    {isEditable&&<button onClick={this.saveChanges} className="save-button"><RiSave3Line className="save-icon" /></button>}
+                    {!isEditable&&<button onClick={this.changeEditState} className="edit-button"><RiEditBoxLine className="edit-icon" /></button>}
+                    <button onClick={this.deleteUser} className="delete-user-button"><AiOutlineDelete className="delete-icon" /></button>
                 </div>
             </li>
         )

@@ -26,6 +26,26 @@ class Dashboard extends Component{
         this.getUserData()
     }
 
+    renderSearchBar = () => (
+        <form onSubmit={this.searchByFilters} className='input-container'>
+            <input placeholder='Search by name, role or email and press ENTER' id='searchInput' type="search" />
+            <BsSearch className='search-icon' />
+        </form>
+    )
+
+    renderTable = (pageinateResults, numberOfButtons, selectedUserIds, activePage) => (
+        <>
+            <div className='table-wrapper'>
+                <ul className='table-container'>
+                    {this.renderTableHeader(pageinateResults)}
+                    {pageinateResults.length===0 && <p className='empty-table'>No users to show</p>}
+                    {pageinateResults.map(item => <TableRow addOrRemoveSelectedRow={this.addOrRemoveSelectedRow} isChecked={selectedUserIds.includes(item.id)} deleteUserFromInitialList={this.deleteUserFromInitialList} key={item.id} userDetails={item} editUserDetails={this.editUserDetails} />)}
+                </ul>
+            </div>
+            <Pagination setActivePage={this.setActivePage} numberOfButtons={numberOfButtons} activePage={activePage} deleteSelectedUsers={this.deleteSelectedUsers} />
+        </>
+    )
+
     //Function that renders the table header
     renderTableHeader = (pageResults) => (
         <li className='table-header'>
@@ -52,7 +72,7 @@ class Dashboard extends Component{
             <ThreeDots type="ThreeDots" color="#00bfff" width={30} height={30} />
         </div>
     )
-
+    
     renderFailureView = () => (
         <div className='error-message'>
             <h1>Oops! Something went wrong</h1>
@@ -140,7 +160,6 @@ class Dashboard extends Component{
         const noOfButtonsUpdated = Math.ceil(remainingUsers.length/noOfResultsPerPage)
         const newActivePage = (noOfButtonsUpdated < activePage)?noOfButtonsUpdated:activePage
             
-        console.log(newActivePage)
         this.setState({usersInformation:remainingUsers, selectedUserIds:[], activePage:newActivePage})
     }
 
@@ -153,6 +172,8 @@ class Dashboard extends Component{
 
     render(){
         const {usersInformation, isLoading, activePage, searchKey, selectedUserIds} = this.state
+        
+        // Get only the users matching the searchinput entered
         const filteredUsersInformation = usersInformation.filter(item => {
             const {name, email, role} = item
             return (name.toLowerCase().includes(searchKey)||(email.toLowerCase().includes(searchKey)||(role.toLowerCase().includes(searchKey))))
@@ -161,33 +182,15 @@ class Dashboard extends Component{
         const startIndex = (activePage-1)*noOfResultsPerPage
         const endIndex = activePage*noOfResultsPerPage
         const pageinateResults = filteredUsersInformation.slice(startIndex, endIndex);
-        const numberOfButtons = Math.ceil(filteredUsersInformation.length/10)
+        const numberOfButtons = Math.ceil(filteredUsersInformation.length/noOfResultsPerPage)
 
         return(
             <div className='admin-db-container'>
                 <h1 className='heading'>Admin Dashboard</h1>
-
-                <form onSubmit={this.searchByFilters} className='input-container'>
-                    <input placeholder='Search by name, role or email' id='searchInput' type="search" />
-                    <BsSearch className='search-icon' />
-                </form>
-
-                {isLoading === loadingStatus.success&&(
-                    <>
-                        <div className='table-wrapper'>
-                            <ul className='table-container'>
-                                {this.renderTableHeader(pageinateResults)}
-                                {pageinateResults.length===0 && <p className='empty-table'>No users to show</p>}
-                                {pageinateResults.map(item => <TableRow addOrRemoveSelectedRow={this.addOrRemoveSelectedRow} isChecked={selectedUserIds.includes(item.id)} deleteUserFromInitialList={this.deleteUserFromInitialList} key={item.id} userDetails={item} editUserDetails={this.editUserDetails} />)}
-                            </ul>
-                        </div>
-                        <Pagination setActivePage={this.setActivePage} numberOfButtons={numberOfButtons} activePage={activePage} deleteSelectedUsers={this.deleteSelectedUsers} />
-                    </>
-                    )}
-
-                {isLoading===loadingStatus.loading&&this.renderLoadingView()}
-                {isLoading===loadingStatus.failure&&this.renderFailureView()}
-
+                {this.renderSearchBar()}
+                {isLoading === loadingStatus.success && this.renderTable(pageinateResults, numberOfButtons, selectedUserIds, activePage)}
+                {isLoading === loadingStatus.loading && this.renderLoadingView()}
+                {isLoading === loadingStatus.failure && this.renderFailureView()}
             </div>
         )
     }
